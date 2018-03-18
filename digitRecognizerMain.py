@@ -58,13 +58,28 @@ def imToBW(imArray):
 train_X, test_X = imToBW(trainX), imToBW(test)
 
 
-train_X, cvX, train_Y, cvY = train_test_split(train_X, trainY, train_size=0.8, random_state=0)
+train_X, cvX, train_Y, cvY = train_test_split(train_X, trainY, train_size=0.05, random_state=0)
+
+# %% Support vector classifier
 
 parameters = {'C':np.logspace(-3,1,5)}
 clf = GridSearchCV(SVC(kernel='linear'), parameters)
 
 clf.fit(train_X,train_Y)
 
-cvPredict = clf.predict(cvX)
-print('CV Score = ' + str(accuracy_score(cvY, cvPredict)))
-testPredict = clf.predict(test_X)
+cvPredictSVM = clf.predict(cvX)
+print('CV Score = ' + str(accuracy_score(cvY, cvPredictSVM)))
+testPredictSVM = clf.predict(test_X)
+
+# %% Plot predicted data
+
+randLabels = np.random.randint(0, len(cvX)-1, 25)
+plt.figure(figsize=(15,15))
+
+for i in range(len(randLabels)):
+    image = np.reshape(cvX[randLabels[i], :], figSize)
+    ax = plt.subplot(5, 5, i+1)
+    ax.imshow(image)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title('Predicted class: '+ str(cvPredictSVM[randLabels[i]]))
