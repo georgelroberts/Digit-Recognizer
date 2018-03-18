@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import learning_curve
+from sklearn.model_selection import learning_curve, ShuffleSplit
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
 # %% First load the data
 
 os.chdir('C:\\Users\\George\OneDrive - University Of Cambridge\\Others\\Machine learning\\Kaggle\\Digit Recognizer')
@@ -60,16 +62,23 @@ def imToBW(imArray):
 
 train_X, test_X = imToBW(trainX), imToBW(test)
 
-train_X, cvX, train_Y, cvY = train_test_split(train_X, trainY,
-                                              train_size=0.05, random_state=0)
+train_X, cvX, train_Y, cvY = train_test_split(trainX, trainY,
+                                              train_size=0.1, random_state=0)
 
-# %% Support vector classifier
+# %% Plot the learning curves
+
+cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
 
 train_sizes, train_scores, valid_scores = learning_curve(
-        SVC(kernel='linear'), train_X, train_Y, train_sizes=[50, 80, 110], cv=5)
+        SVC(kernel='linear', C=0.001), train_X, train_Y,
+        train_sizes=np.linspace(.01, 0.05, 5), cv=cv)
 fig, ax = plt.subplots()
-ax.plot(train_sizes, train_scores)
-ax.plot(train_sizes, valid_scores)
+ax.plot(train_sizes, np.mean(train_scores, axis=1))
+ax.plot(train_sizes, np.mean(valid_scores, axis=1))
+
+# This rounds off around 2000 samples.
+
+# %% Support vector classifier
 
 parameters = {'C': np.logspace(-3, 1, 5)}
 clf = GridSearchCV(SVC(kernel='linear'), parameters)
@@ -79,6 +88,15 @@ clf.fit(train_X, train_Y)
 cvPredictSVM = clf.predict(cvX)
 print('CV Score = ' + str(accuracy_score(cvY, cvPredictSVM)))
 testPredictSVM = clf.predict(test_X)
+
+# %% Multi-layer perceptron
+
+clfMLP = MLPClassifier()
+clfMLP.fit(train_X, train_Y)
+
+cvPredictMLP = clfMLP.predict(cvX)
+print('CV Score = ' + str(accuracy_score(cvY, cvPredictMLP)))
+testPredictMLP = clf.predict(test_X)
 
 # %% Plot predicted data
 
