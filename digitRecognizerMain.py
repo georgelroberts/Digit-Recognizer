@@ -46,7 +46,7 @@ for i in range(len(randLabels)):
     ax.imshow(image)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_title('Training class: ' + str(trainY[randLabels[i]]))
+    ax.set_title(f'Training class: {str(trainY[randLabels[i]])}')
 
 # %% Convert data to B&W, then separate into test and train for classification.
 # Set the train size to low for the time being in order to minimize train time.
@@ -86,7 +86,7 @@ clf = GridSearchCV(SVC(kernel='linear'), parameters)
 clf.fit(train_X, train_Y)
 
 cvPredictSVM = clf.predict(cvX)
-print('CV Score = ' + str(accuracy_score(cvY, cvPredictSVM)))
+print(f'CV Score = {str(accuracy_score(cvY, cvPredictSVM))}')
 testPredictSVM = clf.predict(test_X)
 
 # %% Multi-layer perceptron
@@ -95,7 +95,7 @@ clfMLP = MLPClassifier()
 clfMLP.fit(train_X, train_Y)
 
 cvPredictMLP = clfMLP.predict(cvX)
-print('CV Score = ' + str(accuracy_score(cvY, cvPredictMLP)))
+print(f'CV Score = {str(accuracy_score(cvY, cvPredictMLP))}')
 testPredictMLP = clf.predict(test_X)
 
 # %% Plot predicted data
@@ -109,4 +109,4 @@ for i in range(len(randLabels)):
     ax.imshow(image)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_title('Predicted class: ' + str(cvPredictSVM[randLabels[i]]))
+    ax.set_title(f'Predicted class: {str(cvPredictSVM[randLabels[i]])}')
